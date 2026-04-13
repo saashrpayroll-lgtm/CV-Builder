@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { Shield, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [adminSecret, setAdminSecret] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [showSecret, setShowSecret] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -26,7 +24,7 @@ export default function AdminLoginPage() {
             const res = await fetch("/api/admin/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password, adminSecret }),
+                body: JSON.stringify({ email, password }),
             });
 
             const data = await res.json();
@@ -36,9 +34,8 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            // Set admin session cookie
-            document.cookie = `admin_session=${data.token}; path=/; max-age=86400; samesite=strict`;
             router.push("/portal-admin-panal");
+            router.refresh();
         } catch {
             setError("Network error. Please try again.");
         } finally {
@@ -53,7 +50,6 @@ export default function AdminLoginPage() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
                 <div className="absolute top-1/4 right-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl" />
-                {/* Grid pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
             </div>
 
@@ -107,27 +103,6 @@ export default function AdminLoginPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <Label htmlFor="admin-secret" className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
-                                <Lock className="w-3 h-3" /> Admin Secret Key
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    id="admin-secret"
-                                    type={showSecret ? "text" : "password"}
-                                    placeholder="Enter admin secret key"
-                                    value={adminSecret}
-                                    onChange={(e) => setAdminSecret(e.target.value)}
-                                    required
-                                    className="h-11 rounded-xl bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:ring-indigo-500 pr-10"
-                                />
-                                <button type="button" onClick={() => setShowSecret(!showSecret)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
-                                    {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                </button>
-                            </div>
-                            <p className="text-[10px] text-slate-500">This is the ADMIN_SECRET_KEY from your environment variables</p>
-                        </div>
-
                         <Button
                             type="submit"
                             disabled={loading}
@@ -143,8 +118,8 @@ export default function AdminLoginPage() {
 
                     <div className="mt-6 pt-5 border-t border-slate-800">
                         <p className="text-[11px] text-slate-500 text-center leading-relaxed">
-                            🔒 This portal is protected with triple-layer authentication.
-                            Unauthorized access attempts are logged and monitored.
+                            🔒 Only accounts with ADMIN role can access this portal.
+                            Contact the system administrator if you need access.
                         </p>
                     </div>
                 </div>

@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Bot, Save, TestTube2, Key, Wallet, Image as ImageIcon, CheckCircle } from "lucide-react";
+import { Bot, Save, TestTube2, Key, Wallet, Image as ImageIcon } from "lucide-react";
 
 export default function AdminSettingsForm({ initialData, tab }: { initialData: any, tab: "ai" | "monetization" }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +19,7 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         monetization_enabled: initialData?.monetization_enabled || false,
         export_price_1: initialData?.export_price_1 || 49,
         export_price_3: initialData?.export_price_3 || 99,
-        export_payment_message: initialData?.export_payment_message || 'To unlock downloading and printing, please pay the platform maintenance fee.',
+        export_payment_message: initialData?.export_payment_message || 'Resume export करने के लिए payment करें। AI maintenance और platform charges के लिए यह amount आवश्यक है।',
     });
 
     const handleSave = async (e: React.FormEvent) => {
@@ -51,35 +50,38 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         try {
             await new Promise(r => setTimeout(r, 1500));
             toast.success(`${formData.ai_provider} API connection successful!`);
-        } catch (e) {
+        } catch {
             toast.error("API test failed. Check key validity.");
         } finally {
             setIsTesting(false);
         }
     };
 
+    // Common input class for dark mode visibility
+    const inputClass = "w-full h-10 px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm";
+    const selectClass = "w-full h-10 px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm cursor-pointer";
+
     if (tab === "ai") {
         return (
             <form onSubmit={handleSave} className="space-y-6">
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
                     <div className="space-y-0.5">
-                        <Label className="text-base">Enable AI Engine</Label>
-                        <p className="text-sm text-slate-500">Master switch to enable or disable AI features app-wide.</p>
+                        <Label className="text-base text-white font-bold flex items-center gap-2"><Bot className="w-4 h-4 text-indigo-400" /> Enable AI Engine</Label>
+                        <p className="text-sm text-slate-400">Master switch to enable or disable AI features app-wide for all users.</p>
                     </div>
-                    {/* Native checkbox styled as toggle for simplicity without importing Switch */}
                     <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" checked={formData.ai_enabled} onChange={(e) => setFormData(p => ({ ...p, ai_enabled: e.target.checked }))} />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
+                        <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                 </div>
 
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <Label>AI Provider</Label>
-                        <select 
-                            value={formData.ai_provider} 
+                        <Label className="text-sm font-bold text-slate-300">AI Provider</Label>
+                        <select
+                            value={formData.ai_provider}
                             onChange={(e) => setFormData(p => ({ ...p, ai_provider: e.target.value }))}
-                            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950"
+                            className={selectClass}
                         >
                             <option value="GEMINI">Google Gemini</option>
                             <option value="OPENAI">OpenAI (GPT-4)</option>
@@ -88,33 +90,35 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="flex items-center gap-2">
-                            <Key className="w-4 h-4" /> API Key (Encrypted DB Storage)
+                        <Label className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                            <Key className="w-4 h-4 text-amber-400" /> API Key
                         </Label>
                         <div className="flex gap-2">
-                            <Input 
-                                type="password" 
-                                placeholder="sk-..." 
+                            <input
+                                type="password"
+                                placeholder="sk-... or AIza..."
                                 value={formData.ai_api_key}
                                 onChange={(e) => setFormData(p => ({ ...p, ai_api_key: e.target.value }))}
+                                className={inputClass}
                             />
-                            <Button 
-                                type="button" 
-                                variant="secondary" 
-                                onClick={handleTestAI} 
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={handleTestAI}
                                 disabled={isTesting || !formData.ai_api_key}
+                                className="bg-slate-700 hover:bg-slate-600 text-white border-slate-600 h-10 px-4 rounded-xl flex-shrink-0"
                             >
                                 <TestTube2 className="w-4 h-4 mr-2" />
-                                {isTesting ? "Testing..." : "Test App"}
+                                {isTesting ? "Testing..." : "Test"}
                             </Button>
                         </div>
-                        <p className="text-xs text-slate-500">Your key is never exposed to the frontend users. It executes server-side.</p>
+                        <p className="text-xs text-slate-500">Your key is never exposed to users. It runs server-side only.</p>
                     </div>
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                    <Button disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                        <Save className="w-4 h-4 mr-2" /> 
+                    <Button disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-10 px-6">
+                        <Save className="w-4 h-4 mr-2" />
                         {isLoading ? "Saving..." : "Save AI Config"}
                     </Button>
                 </div>
@@ -124,65 +128,99 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
 
     return (
         <form onSubmit={handleSave} className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+            {/* Monetization Toggle */}
+            <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
                 <div className="space-y-0.5">
-                    <Label className="text-base text-emerald-600 dark:text-emerald-400 font-bold">Enable Monetization (Export Lock)</Label>
-                    <p className="text-sm text-slate-500">When enabled, users must pay to Print/Export their resumes.</p>
+                    <Label className="text-base text-emerald-400 font-bold flex items-center gap-2">
+                        <Wallet className="w-4 h-4" /> Enable Monetization (Export Lock)
+                    </Label>
+                    <p className="text-sm text-slate-400">When ON, users must pay to Print/Export/Download their resumes.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" checked={formData.monetization_enabled} onChange={(e) => setFormData(p => ({ ...p, monetization_enabled: e.target.checked }))} />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-600"></div>
+                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                 </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Pricing */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label>Price for 1 Export (INR)</Label>
-                    <Input 
-                        type="number" 
-                        min={1} 
+                    <Label className="text-sm font-bold text-slate-300">💰 Price for 1 Export (₹ INR)</Label>
+                    <input
+                        type="number"
+                        min={1}
                         value={formData.export_price_1}
                         onChange={(e) => setFormData(p => ({ ...p, export_price_1: Number(e.target.value) }))}
+                        className={inputClass}
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label>Price for 3 Exports (INR)</Label>
-                    <Input 
-                        type="number" 
-                        min={1} 
+                    <Label className="text-sm font-bold text-slate-300">💎 Price for 3 Exports (₹ INR)</Label>
+                    <input
+                        type="number"
+                        min={1}
                         value={formData.export_price_3}
                         onChange={(e) => setFormData(p => ({ ...p, export_price_3: Number(e.target.value) }))}
+                        className={inputClass}
                     />
                 </div>
             </div>
 
+            {/* Paywall Message */}
             <div className="space-y-2">
-                <Label>Custom Paywall Message</Label>
-                <Input 
-                    type="text" 
-                    placeholder="E.g. Pay ₹49 to unlock premium exporting..." 
+                <Label className="text-sm font-bold text-slate-300">📝 Custom Paywall Message (Users will see this)</Label>
+                <textarea
+                    rows={3}
+                    placeholder="E.g. Resume export करने के लिए ₹49 pay करें..."
                     value={formData.export_payment_message}
                     onChange={(e) => setFormData(p => ({ ...p, export_payment_message: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"
                 />
             </div>
-            
-            <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <Label className="flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> UPI QR Code Image URL
+
+            {/* UPI QR Code */}
+            <div className="space-y-3 pt-4 border-t border-slate-700/50">
+                <Label className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-cyan-400" /> UPI QR Code Image URL
                 </Label>
-                <Input 
-                    type="url" 
-                    placeholder="https://mysite.com/my-upi.png" 
+                <input
+                    type="url"
+                    placeholder="https://i.ibb.co/abc123/my-upi-qr.png"
                     value={formData.payment_upi_qr}
                     onChange={(e) => setFormData(p => ({ ...p, payment_upi_qr: e.target.value }))}
+                    className={inputClass}
                 />
-                <p className="text-xs text-slate-500">Provide an absolute URL to your UPI QR image so users can scan and pay.</p>
+                <p className="text-xs text-slate-500">Upload your UPI QR Code to <a href="https://imgbb.com" target="_blank" rel="noreferrer" className="text-indigo-400 underline">imgbb.com</a> and paste the direct image URL here.</p>
+
+                {/* QR Preview */}
+                {formData.payment_upi_qr && (
+                    <div className="p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                        <p className="text-xs text-slate-400 mb-2 font-bold">QR Preview (what users will see):</p>
+                        <div className="w-40 h-40 mx-auto bg-white rounded-xl p-2 overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={formData.payment_upi_qr} alt="UPI QR" className="w-full h-full object-contain" />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* UPI ID (optional text link) */}
+            <div className="space-y-2">
+                <Label className="text-sm font-bold text-slate-300">🔗 UPI Payment Link / ID (Optional)</Label>
+                <input
+                    type="text"
+                    placeholder="upi://pay?pa=yourname@upi&pn=YourName"
+                    value={formData.payment_gateway_key}
+                    onChange={(e) => setFormData(p => ({ ...p, payment_gateway_key: e.target.value }))}
+                    className={inputClass}
+                />
+                <p className="text-xs text-slate-500">Optional: Direct UPI link so users can tap and pay on mobile.</p>
             </div>
 
             <div className="pt-4 flex justify-end gap-2">
-                <Button disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <Save className="w-4 h-4 mr-2" /> 
-                    {isLoading ? "Saving..." : "Save Monetization"}
+                <Button disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-10 px-6">
+                    <Save className="w-4 h-4 mr-2" />
+                    {isLoading ? "Saving..." : "Save Monetization Settings"}
                 </Button>
             </div>
         </form>

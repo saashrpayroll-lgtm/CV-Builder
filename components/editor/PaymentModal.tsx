@@ -131,6 +131,18 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                             </div>
                         </div>
 
+                        {/* Direct UPI Pay Link */}
+                        {monetizationSettings?.payment_gateway_key && (
+                            <a
+                                href={monetizationSettings.payment_gateway_key}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full flex items-center justify-center gap-2 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
+                            >
+                                <IndianRupee className="w-4 h-4" /> Tap to Pay ₹{price} via UPI
+                            </a>
+                        )}
+
                         {/* UTR Input Form */}
                         <div className="space-y-3">
                             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Submit Transaction ID (UTR)</label>

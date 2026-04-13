@@ -19,11 +19,12 @@ interface TopActionBarProps {
 }
 
 export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizationSettings }: TopActionBarProps) {
-    const { data, isSaving, setIsSaving, markSaved, lastSaved, isPro } = useResumeStore();
+    const { data, isSaving, setIsSaving, markSaved, lastSaved } = useResumeStore();
     const [showExportMenu, setShowExportMenu] = useState(false);
     const [showPayment, setShowPayment] = useState(false);
 
     const isMonetized = monetizationSettings?.monetization_enabled;
+    const isLocked = isMonetized && exportCredits <= 0;
 
     const handleSave = useCallback(async (silent = false) => {
         if (!resumeId || isSaving) return;
@@ -63,17 +64,13 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
 
     const enforcePaywall = (action: () => void) => {
         setShowExportMenu(false);
-        if (isMonetized && exportCredits <= 0) {
+        if (isLocked) {
             setShowPayment(true);
             return;
         }
-        
-        // If not monetized or has credits
+
         if (isMonetized) {
             toast.success(`Export authorized! Remaining credits after this: ${exportCredits - 1}`);
-            // Note: Ideally, deduct credit via an API call here before releasing the print.
-            // But for ease of flow in client side right now we just let them print. 
-            // In a strict environment, the PDF generation happens on the server where credit is deducted.
         }
         action();
     };
@@ -86,6 +83,12 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
     };
 
     const handleDownloadPdf = () => {
+        enforcePaywall(() => {
+            onPrint?.();
+        });
+    };
+
+    const handlePrint = () => {
         enforcePaywall(() => {
             onPrint?.();
         });
@@ -129,14 +132,25 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
                         )}
                     </div>
 
+                    {/* Print Button */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrint}
+                        className={`h-8 text-xs font-bold gap-1.5 ${isLocked ? 'text-amber-600 border-amber-300 hover:bg-amber-50' : ''}`}
+                    >
+                        {isLocked ? <Lock className="w-3.5 h-3.5" /> : <Printer className="w-3.5 h-3.5 text-slate-500" />}
+                        Print
+                    </Button>
+
                     {/* Export dropdown */}
                     <div className="relative">
                         <Button
-                            variant={isMonetized && exportCredits <= 0 ? "default" : "outline"} size="sm"
-                            className={`h-8 text-xs font-bold gap-1.5 transition-all ${isMonetized && exportCredits <= 0 ? 'bg-amber-500 hover:bg-amber-600 text-white border-transparent' : ''}`}
+                            variant={isLocked ? "default" : "outline"} size="sm"
+                            className={`h-8 text-xs font-bold gap-1.5 transition-all ${isLocked ? 'bg-amber-500 hover:bg-amber-600 text-white border-transparent' : ''}`}
                             onClick={() => setShowExportMenu(!showExportMenu)}
                         >
-                            {isMonetized && exportCredits <= 0 ? <Lock className="w-3.5 h-3.5"/> : <Download className="w-3.5 h-3.5 text-indigo-500" />} 
+                            {isLocked ? <Lock className="w-3.5 h-3.5"/> : <Download className="w-3.5 h-3.5 text-indigo-500" />}
                             Export
                             <ChevronDown className="w-3 h-3" />
                         </Button>
@@ -145,12 +159,12 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
                                 <button onClick={handleDownloadPdf}
                                     className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">
                                     <span className="flex items-center gap-2"><FileText className="w-4 h-4 text-rose-500" /> PDF</span>
-                                    {isMonetized && exportCredits <= 0 && <Lock className="w-3 h-3 text-amber-500" />}
+                                    {isLocked && <Lock className="w-3 h-3 text-amber-500" />}
                                 </button>
                                 <button onClick={handleDownloadDocx}
                                     className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 mt-1">
                                     <span className="flex items-center gap-2"><FileText className="w-4 h-4 text-blue-500" /> DOCX</span>
-                                    {isMonetized && exportCredits <= 0 && <Lock className="w-3 h-3 text-amber-500" />}
+                                    {isLocked && <Lock className="w-3 h-3 text-amber-500" />}
                                 </button>
                             </div>
                         )}
@@ -168,10 +182,10 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
                 </div>
             </header>
 
-            <PaymentModal 
-                isOpen={showPayment} 
-                onClose={() => setShowPayment(false)} 
-                monetizationSettings={monetizationSettings} 
+            <PaymentModal
+                isOpen={showPayment}
+                onClose={() => setShowPayment(false)}
+                monetizationSettings={monetizationSettings}
             />
         </>
     );
