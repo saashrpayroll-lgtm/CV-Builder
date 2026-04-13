@@ -1,0 +1,29 @@
+{
+    "templateId": "modern_gradient_v1",
+    "name": "Modern Gradient",
+    "category": "Modern",
+    "isATS": true,
+    "layout": "two-column",
+    "columns": [
+        35,
+        65
+    ],
+    "supportedSections": [
+        "personalInfo",
+        "summary",
+        "skills",
+        "workExperience",
+        "education",
+        "projects"
+    ],
+    "themes": [
+        "blue",
+        "purple",
+        "green"
+    ],
+    "fonts": [
+        "Inter",
+        "Poppins"
+    ],
+    "defaultTheme": "blue"
+}

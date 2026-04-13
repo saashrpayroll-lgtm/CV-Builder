@@ -1,0 +1,22 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { tailorResumeForJob } from "@/lib/ai/ai-actions";
+
+export async function POST(req: NextRequest) {
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+        const { resumeData, jobDescription } = await req.json();
+        if (!resumeData || !jobDescription) {
+            return NextResponse.json({ error: "Resume data and job description required" }, { status: 400 });
+        }
+
+        const result = await tailorResumeForJob(resumeData, jobDescription);
+        return NextResponse.json({ success: true, ...result });
+    } catch (error) {
+        console.error("[AI_TAILOR]", error);
+        return NextResponse.json({ error: "Failed to tailor resume" }, { status: 500 });
+    }
+}

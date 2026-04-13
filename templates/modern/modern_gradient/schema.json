@@ -1,0 +1,11 @@
+{
+    "workExperience": {
+        "style": "timeline",
+        "bullet": "dot",
+        "highlightMetrics": true
+    },
+    "skills": {
+        "layout": "grid",
+        "columns": 2
+    }
+}
