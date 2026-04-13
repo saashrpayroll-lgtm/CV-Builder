@@ -20,6 +20,18 @@ import ModernRightTemplate from "./ModernRightTemplate";
 import StartupTemplate from "./StartupTemplate";
 import UniversalRenderer from "./UniversalRenderer";
 
+// 10 Epic Templates added
+import CyberpunkTemplate from "./CyberpunkTemplate";
+import MinimalDarkTemplate from "./MinimalDarkTemplate";
+import TwoColumnCleanTemplate from "./TwoColumnCleanTemplate";
+import PastelDreamTemplate from "./PastelDreamTemplate";
+import DataScientistTemplate from "./DataScientistTemplate";
+import ExecutiveSuiteTemplate from "./ExecutiveSuiteTemplate";
+import CreativePortfolioTemplate from "./CreativePortfolioTemplate";
+import NeonTechTemplate from "./NeonTechTemplate";
+import RetroTerminalTemplate from "./RetroTerminalTemplate";
+import ModernMonochromeTemplate from "./ModernMonochromeTemplate";
+
 interface TemplateRendererProps {
     templateId: string;
     data: ResumeData;
@@ -46,6 +58,18 @@ const templateMap: Record<string, React.ComponentType<{ data: ResumeData; isPrin
     'newspaper': NewspaperTemplate,
     'modern-right': ModernRightTemplate,
     'startup': StartupTemplate,
+    
+    // New Epics
+    'cyberpunk': CyberpunkTemplate,
+    'minimal-dark': MinimalDarkTemplate,
+    'two-column-clean': TwoColumnCleanTemplate,
+    'pastel-dream': PastelDreamTemplate,
+    'data-scientist': DataScientistTemplate,
+    'executive-suite': ExecutiveSuiteTemplate,
+    'creative-portfolio': CreativePortfolioTemplate,
+    'neon-tech': NeonTechTemplate,
+    'retro-terminal': RetroTerminalTemplate,
+    'modern-monochrome': ModernMonochromeTemplate,
 };
 
 export default function TemplateRenderer({ templateId, data, isPrint }: TemplateRendererProps) {

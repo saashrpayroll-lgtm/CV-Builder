@@ -67,3 +67,32 @@ create policy "Users can delete their own resumes" on public.resumes
 -- Public access policy (if resume is public)
 create policy "Public resumes are viewable by everyone" on public.resumes
   for select using (is_public = true);
+
+-- Admin Settings Table for BYOK & Monetization
+create table public.admin_settings (
+  id uuid default gen_random_uuid() primary key,
+  admin_id uuid references public.users(id) on delete cascade not null,
+  ai_enabled boolean default false,
+  ai_provider text default 'GEMINI' check (ai_provider in ('GEMINI', 'OPENAI', 'GROQ')),
+  ai_api_key text,
+  payment_upi_qr text,
+  payment_gateway_key text,
+  premium_price numeric default 10,
+  monetization_enabled boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique(admin_id)
+);
+
+-- Enable RLS
+alter table public.admin_settings enable row level security;
+
+-- Policies for admin settings
+create policy "Admins can view their own settings" on public.admin_settings
+  for select using (auth.uid() = admin_id);
+
+create policy "Admins can insert their own settings" on public.admin_settings
+  for insert with check (auth.uid() = admin_id);
+
+create policy "Admins can update their own settings" on public.admin_settings
+  for update using (auth.uid() = admin_id);

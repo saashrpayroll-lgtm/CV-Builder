@@ -3,14 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { LogIn, AlertCircle } from "lucide-react";
+import { LogIn, AlertCircle, CheckCircle2 } from "lucide-react";
+import { GoogleLoginButton } from "@/components/auth/OAuthButtons";
 
 interface LoginPageProps {
-    searchParams: Promise<{ error?: string }>;
+    searchParams: Promise<{ error?: string, success?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-    const { error } = await searchParams;
+    const { error, success } = await searchParams;
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4">
@@ -42,6 +43,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                             <p>{error}</p>
                         </div>
                     )}
+                    {success && (
+                        <div className="flex items-center gap-2 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 p-3 rounded-xl mb-4 border border-green-100 dark:border-green-500/20 text-sm">
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                            <p>{success}</p>
+                        </div>
+                    )}
 
                     <form className="space-y-4">
                         <div className="space-y-1.5">
@@ -50,7 +57,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                                 className="h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-indigo-500" />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="password" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Password</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Password</Label>
+                                <Link href="/forgot-password" className="text-xs text-indigo-600 font-medium hover:text-indigo-500">Forgot password?</Link>
+                            </div>
                             <Input id="password" name="password" type="password" placeholder="Your password" required
                                 className="h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:ring-indigo-500" />
                         </div>
@@ -58,6 +68,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                             <LogIn className="w-4 h-4 mr-2" /> Login
                         </Button>
                     </form>
+
+                    <div className="my-6 flex items-center gap-3">
+                        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+                        <span className="text-xs text-slate-400 uppercase font-medium">Or continue with</span>
+                        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+                    </div>
+
+                    <GoogleLoginButton />
 
                     <div className="mt-6 text-center text-sm text-slate-500">
                         Don't have an account?{" "}

@@ -64,3 +64,43 @@ export async function signup(formData: FormData) {
     revalidatePath('/', 'layout')
     redirect('/dashboard')
 }
+
+export async function forgotPassword(formData: FormData) {
+    const supabase = await createClient()
+    const email = formData.get('email') as string
+    const headersList = await (await import('next/headers')).headers()
+    const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || ''
+
+    if (!email) {
+        redirect('/forgot-password?error=' + encodeURIComponent('Email is required'))
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/reset-password`,
+    })
+
+    if (error) {
+        redirect(`/forgot-password?error=${encodeURIComponent(error.message)}`)
+    }
+
+    redirect('/forgot-password?success=' + encodeURIComponent('Password reset instructions have been sent to your email.'))
+}
+
+export async function updatePassword(formData: FormData) {
+    const supabase = await createClient()
+    const password = formData.get('password') as string
+
+    if (!password || password.length < 6) {
+        redirect('/reset-password?error=' + encodeURIComponent('Password must be at least 6 characters'))
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    })
+
+    if (error) {
+        redirect(`/reset-password?error=${encodeURIComponent(error.message)}`)
+    }
+
+    redirect('/login?error=' + encodeURIComponent('Password updated successfully. Please login with your new password.'))
+}

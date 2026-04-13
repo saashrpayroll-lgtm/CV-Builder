@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Sparkles, AlertCircle } from "lucide-react";
+import { GoogleLoginButton } from "@/components/auth/OAuthButtons";
 
 interface SignupPageProps {
     searchParams: Promise<{ error?: string }>;
@@ -63,6 +64,14 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             <Sparkles className="w-4 h-4 mr-2" /> Create Account
                         </Button>
                     </form>
+
+                    <div className="my-6 flex items-center gap-3">
+                        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+                        <span className="text-xs text-slate-400 uppercase font-medium">Or continue with</span>
+                        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+                    </div>
+
+                    <GoogleLoginButton />
 
                     <div className="mt-6 text-center text-sm text-slate-500">
                         Already have an account?{" "}
