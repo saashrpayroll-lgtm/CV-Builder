@@ -74,6 +74,7 @@ export async function PUT(req: NextRequest) {
         export_price_1: body.export_price_1,
         export_price_3: body.export_price_3,
         export_payment_message: body.export_payment_message,
+        auto_approve_payments: body.auto_approve_payments,
         updated_at: new Date().toISOString()
     };
 

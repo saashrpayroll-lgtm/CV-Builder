@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
         { title: "Total Revenue", value: `₹${revenue.toLocaleString()}`, change: `${approvedCount} approved`, icon: CreditCard, color: "from-emerald-500 to-green-500", bgGlow: "shadow-emerald-500/20" },
         { title: "Pending UTRs", value: pendingCount, change: "Awaiting review", icon: Clock, color: "from-amber-500 to-orange-500", bgGlow: "shadow-amber-500/20" },
         { title: "AI Engine", value: adminSettings?.ai_enabled ? "Active" : "Disabled", change: adminSettings?.ai_provider || "GEMINI", icon: Bot, color: "from-pink-500 to-rose-500", bgGlow: "shadow-pink-500/20" },
-        { title: "Monetization", value: adminSettings?.monetization_enabled ? "Enabled" : "Off", change: `₹${adminSettings?.export_price_1 || 49}/export`, icon: Wallet, color: "from-indigo-500 to-blue-500", bgGlow: "shadow-indigo-500/20" },
+        { title: "Monetization", value: adminSettings?.monetization_enabled ? "Enabled" : "Off", change: adminSettings?.auto_approve_payments ? "⚡ Auto-Approve ON" : `₹${adminSettings?.export_price_1 || 49}/export`, icon: Wallet, color: "from-indigo-500 to-blue-500", bgGlow: "shadow-indigo-500/20" },
     ];
 
     return (
@@ -89,8 +89,8 @@ export default async function AdminDashboard() {
                             <Activity className="w-3 h-3 text-emerald-400 animate-pulse" />
                             <span>{user.email}</span>
                         </div>
-                        <Link href="/dashboard" className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50 hover:border-slate-600">
-                            <ArrowUpRight className="w-3 h-3" /> Dashboard
+                        <Link href="/portal-admin-panal" className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:border-indigo-500/40">
+                            <Shield className="w-3 h-3" /> Admin Home
                         </Link>
                         <Link href="/auth/signout" className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition-colors bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20 hover:border-rose-500/40">
                             <LogOut className="w-3 h-3" /> Logout

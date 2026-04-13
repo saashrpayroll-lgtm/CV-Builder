@@ -10,7 +10,7 @@ import { submitUTR } from "@/app/actions/payments";
 interface PaymentModalProps {
     isOpen: boolean;
     onClose: () => void;
-    monetizationSettings: any;
+    monetizationSettings: Record<string, string | number | boolean | null>;
 }
 
 export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentModalProps) {
@@ -21,7 +21,7 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
 
     if (!isOpen) return null;
 
-    const price = selectedPackage === 1 ? monetizationSettings?.export_price_1 : monetizationSettings?.export_price_3;
+    const price = Number(selectedPackage === 1 ? monetizationSettings?.export_price_1 : monetizationSettings?.export_price_3) || 49;
 
     const handleSubmit = async () => {
         if (!utr || utr.trim().length < 8) {
@@ -37,12 +37,22 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
             toast.error(res.error);
         } else {
             setIsSuccess(true);
-            toast.success("UTR submitted! Waiting for Admin approval.");
-            setTimeout(() => {
-                onClose();
-                setIsSuccess(false);
-                setUtr("");
-            }, 3000);
+            if (res.autoApproved) {
+                toast.success("🎉 Payment auto-approved! Export unlocked instantly!");
+                setTimeout(() => {
+                    onClose();
+                    setIsSuccess(false);
+                    setUtr("");
+                    window.location.reload(); // Reload to refresh credits
+                }, 2000);
+            } else {
+                toast.success("UTR submitted! Waiting for Admin approval.");
+                setTimeout(() => {
+                    onClose();
+                    setIsSuccess(false);
+                    setUtr("");
+                }, 3000);
+            }
         }
     };
 
@@ -114,7 +124,7 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                             {monetizationSettings?.payment_upi_qr ? (
                                 <div className="w-24 h-24 shrink-0 bg-white p-1 rounded-lg border shadow-sm flex items-center justify-center">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={monetizationSettings.payment_upi_qr} alt="UPI QR" className="max-w-full max-h-full rounded" />
+                                    <img src={String(monetizationSettings.payment_upi_qr)} alt="UPI QR" className="max-w-full max-h-full rounded" />
                                 </div>
                             ) : (
                                 <div className="w-24 h-24 shrink-0 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center text-slate-400">
@@ -134,7 +144,7 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                         {/* Direct UPI Pay Link */}
                         {monetizationSettings?.payment_gateway_key && (
                             <a
-                                href={monetizationSettings.payment_gateway_key}
+                                href={String(monetizationSettings.payment_gateway_key)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full flex items-center justify-center gap-2 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"

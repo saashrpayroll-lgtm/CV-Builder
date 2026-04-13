@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json({ success: true, user: { id: data.user.id, email: data.user.email } });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("[ADMIN_LOGIN_ERROR]", error);
         return NextResponse.json({ error: "Authentication failed" }, { status: 500 });
     }

@@ -15,7 +15,7 @@ interface TopActionBarProps {
     onPrint?: () => void;
     resumeId?: string;
     exportCredits?: number;
-    monetizationSettings?: any;
+    monetizationSettings?: Record<string, string | number | boolean | null>;
 }
 
 export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizationSettings }: TopActionBarProps) {
@@ -185,7 +185,7 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
             <PaymentModal
                 isOpen={showPayment}
                 onClose={() => setShowPayment(false)}
-                monetizationSettings={monetizationSettings}
+                monetizationSettings={monetizationSettings || {}}
             />
         </>
     );

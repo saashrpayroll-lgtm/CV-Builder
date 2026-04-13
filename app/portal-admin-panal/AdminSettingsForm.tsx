@@ -20,6 +20,7 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         export_price_1: initialData?.export_price_1 || 49,
         export_price_3: initialData?.export_price_3 || 99,
         export_payment_message: initialData?.export_payment_message || 'Resume export करने के लिए payment करें। AI maintenance और platform charges के लिए यह amount आवश्यक है।',
+        auto_approve_payments: initialData?.auto_approve_payments || false,
     });
 
     const handleSave = async (e: React.FormEvent) => {
@@ -139,6 +140,20 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" checked={formData.monetization_enabled} onChange={(e) => setFormData(p => ({ ...p, monetization_enabled: e.target.checked }))} />
                     <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+            </div>
+
+            {/* Auto-Approve Toggle */}
+            <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-amber-500/20">
+                <div className="space-y-0.5">
+                    <Label className="text-base text-amber-400 font-bold flex items-center gap-2">
+                        ⚡ Auto-Approve Payments
+                    </Label>
+                    <p className="text-sm text-slate-400">When ON, user payments are auto-approved instantly — no manual UTR review needed. Export/Print unlocks automatically after payment.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={formData.auto_approve_payments} onChange={(e) => setFormData(p => ({ ...p, auto_approve_payments: e.target.checked }))} />
+                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                 </label>
             </div>
 
