@@ -71,6 +71,9 @@ export async function PUT(req: NextRequest) {
         payment_gateway_key: body.payment_gateway_key !== undefined ? body.payment_gateway_key : undefined,
         premium_price: body.premium_price,
         monetization_enabled: body.monetization_enabled,
+        export_price_1: body.export_price_1,
+        export_price_3: body.export_price_3,
+        export_payment_message: body.export_payment_message,
         updated_at: new Date().toISOString()
     };
 

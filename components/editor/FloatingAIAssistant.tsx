@@ -137,18 +137,33 @@ export function FloatingAIAssistant() {
                 )}
             </AnimatePresence>
 
-            <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 relative",
-                    isOpen ? "bg-slate-800 text-white rotate-45" : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white animate-float"
+                    "w-14 h-14 rounded-full shadow-2xl shadow-indigo-500/50 flex items-center justify-center transition-all duration-500 relative z-10",
+                    isOpen ? "bg-slate-800 text-white rotate-180" : "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-110",
+                    activeAction ? "animate-spin-slow" : "animate-float"
                 )}
             >
-                {!isOpen && <div className="absolute inset-0 rounded-full bg-white/20 animate-pulse-slow" />}
-                {isOpen ? <X className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
-            </motion.button>
+                {/* AI Thinking glow */}
+                {(!isOpen || activeAction) && (
+                    <div className="absolute -inset-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-lg opacity-40 animate-pulse" />
+                )}
+                
+                {/* Active loading ring */}
+                {activeAction && (
+                    <svg className="absolute inset-0 w-full h-full -rotate-90 animate-spin" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray="301" strokeDashoffset="250" className="text-white/40" />
+                    </svg>
+                )}
+
+                {isOpen ? <X className="w-6 h-6 transition-transform rotate-180" /> : <Sparkles className="w-6 h-6" />}
+            </button>
+            
+            {/* Background Magic Particles when closed */}
+            {!isOpen && !activeAction && (
+                <div className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-20 pointer-events-none" style={{ animationDuration: '3s' }} />
+            )}
         </div>
     );
 }

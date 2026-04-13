@@ -18,6 +18,9 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         payment_gateway_key: initialData?.payment_gateway_key || '',
         premium_price: initialData?.premium_price || 10,
         monetization_enabled: initialData?.monetization_enabled || false,
+        export_price_1: initialData?.export_price_1 || 49,
+        export_price_3: initialData?.export_price_3 || 99,
+        export_payment_message: initialData?.export_payment_message || 'To unlock downloading and printing, please pay the platform maintenance fee.',
     });
 
     const handleSave = async (e: React.FormEvent) => {
@@ -46,8 +49,6 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         }
         setIsTesting(true);
         try {
-            // Test call (simulated or real depending on backend)
-            // Typically calls an isolated ping route, but for now we timeout 
             await new Promise(r => setTimeout(r, 1500));
             toast.success(`${formData.ai_provider} API connection successful!`);
         } catch (e) {
@@ -125,54 +126,61 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         <form onSubmit={handleSave} className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="space-y-0.5">
-                    <Label className="text-base">Enable Monetization</Label>
-                    <p className="text-sm text-slate-500">Restrict premium templates to paid users only.</p>
+                    <Label className="text-base text-emerald-600 dark:text-emerald-400 font-bold">Enable Monetization (Export Lock)</Label>
+                    <p className="text-sm text-slate-500">When enabled, users must pay to Print/Export their resumes.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" checked={formData.monetization_enabled} onChange={(e) => setFormData(p => ({ ...p, monetization_enabled: e.target.checked }))} />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-green-600"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-600"></div>
                 </label>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label>Premium Price ($ USD)</Label>
+                    <Label>Price for 1 Export (INR)</Label>
                     <Input 
                         type="number" 
                         min={1} 
-                        value={formData.premium_price}
-                        onChange={(e) => setFormData(p => ({ ...p, premium_price: Number(e.target.value) }))}
+                        value={formData.export_price_1}
+                        onChange={(e) => setFormData(p => ({ ...p, export_price_1: Number(e.target.value) }))}
                     />
                 </div>
-
                 <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                        <Wallet className="w-4 h-4" /> Stripe / Custom Gateway Key
-                    </Label>
+                    <Label>Price for 3 Exports (INR)</Label>
                     <Input 
-                        type="password" 
-                        placeholder="sk_test_..." 
-                        value={formData.payment_gateway_key}
-                        onChange={(e) => setFormData(p => ({ ...p, payment_gateway_key: e.target.value }))}
+                        type="number" 
+                        min={1} 
+                        value={formData.export_price_3}
+                        onChange={(e) => setFormData(p => ({ ...p, export_price_3: Number(e.target.value) }))}
                     />
-                </div>
-                
-                <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4" /> UPI QR Code Image URL
-                    </Label>
-                    <Input 
-                        type="url" 
-                        placeholder="https://mysite.com/my-upi.png" 
-                        value={formData.payment_upi_qr}
-                        onChange={(e) => setFormData(p => ({ ...p, payment_upi_qr: e.target.value }))}
-                    />
-                    <p className="text-xs text-slate-500">Provide an absolute URL to your UPI QR image to accept direct payments.</p>
                 </div>
             </div>
 
+            <div className="space-y-2">
+                <Label>Custom Paywall Message</Label>
+                <Input 
+                    type="text" 
+                    placeholder="E.g. Pay ₹49 to unlock premium exporting..." 
+                    value={formData.export_payment_message}
+                    onChange={(e) => setFormData(p => ({ ...p, export_payment_message: e.target.value }))}
+                />
+            </div>
+            
+            <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <Label className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" /> UPI QR Code Image URL
+                </Label>
+                <Input 
+                    type="url" 
+                    placeholder="https://mysite.com/my-upi.png" 
+                    value={formData.payment_upi_qr}
+                    onChange={(e) => setFormData(p => ({ ...p, payment_upi_qr: e.target.value }))}
+                />
+                <p className="text-xs text-slate-500">Provide an absolute URL to your UPI QR image so users can scan and pay.</p>
+            </div>
+
             <div className="pt-4 flex justify-end gap-2">
-                <Button disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Button disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                     <Save className="w-4 h-4 mr-2" /> 
                     {isLoading ? "Saving..." : "Save Monetization"}
                 </Button>

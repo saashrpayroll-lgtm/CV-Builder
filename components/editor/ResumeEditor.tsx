@@ -7,9 +7,11 @@ import EditorLayout from "@/components/editor/EditorLayout";
 interface ResumeEditorProps {
     initialData: any;
     isPro: boolean;
+    exportCredits: number;
+    monetizationSettings: any;
 }
 
-export default function ResumeEditor({ initialData, isPro }: ResumeEditorProps) {
+export default function ResumeEditor({ initialData, isPro, exportCredits, monetizationSettings }: ResumeEditorProps) {
     const { setResumeData, setIsPro } = useResumeStore();
     const isMounted = useRef(false);
 
@@ -42,5 +44,11 @@ export default function ResumeEditor({ initialData, isPro }: ResumeEditorProps) 
         }
     }, [initialData, setResumeData]);
 
-    return <EditorLayout resumeId={initialData.id} />;
+    return (
+        <EditorLayout 
+            resumeId={initialData.id} 
+            exportCredits={exportCredits}
+            monetizationSettings={monetizationSettings}
+        />
+    );
 }

@@ -16,12 +16,15 @@ import { cn } from "@/lib/utils";
 
 interface EditorLayoutProps {
     resumeId?: string;
+    exportCredits?: number;
+    monetizationSettings?: any;
 }
 
-export default function EditorLayout({ resumeId }: EditorLayoutProps) {
+export default function EditorLayout({ resumeId, exportCredits, monetizationSettings }: EditorLayoutProps) {
     const [zoom, setZoom] = useState(80);
     const [leftPanelVisible, setLeftPanelVisible] = useState(true);
     const [rightPanelVisible, setRightPanelVisible] = useState(true);
+    const [isTheftAttempt, setIsTheftAttempt] = useState(false);
     const componentRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = useReactToPrint({
@@ -29,9 +32,39 @@ export default function EditorLayout({ resumeId }: EditorLayoutProps) {
         documentTitle: "My_Resume",
     });
 
+    // Anti-theft mechanism to prevent Ctrl+P and Right-Click
+    useEffect(() => {
+        if (!monetizationSettings?.monetization_enabled) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+                e.preventDefault();
+                setIsTheftAttempt(true);
+                setTimeout(() => setIsTheftAttempt(false), 3000);
+            }
+        };
+        const handleContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+            setIsTheftAttempt(true);
+            setTimeout(() => setIsTheftAttempt(false), 3000);
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('contextmenu', handleContextMenu);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('contextmenu', handleContextMenu);
+        };
+    }, [monetizationSettings]);
+
     return (
-        <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
-            <TopActionBar onPrint={handlePrint} resumeId={resumeId} />
+        <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden select-none">
+            <TopActionBar 
+                onPrint={handlePrint} 
+                resumeId={resumeId}
+                exportCredits={exportCredits}
+                monetizationSettings={monetizationSettings}
+            />
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* LEFT: Templates */}
@@ -79,17 +112,33 @@ export default function EditorLayout({ resumeId }: EditorLayoutProps) {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-auto p-6 lg:p-10 flex justify-center custom-scrollbar">
+                    <div className="flex-1 overflow-auto p-6 lg:p-10 flex justify-center custom-scrollbar relative">
                         <div
                             style={{
                                 transform: `scale(${zoom / 100})`,
                                 transformOrigin: 'top center',
                                 transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
-                            className="shadow-[0_20px_50px_rgba(0,0,0,0.08)] h-fit mb-20 rounded-sm ring-1 ring-black/5"
+                            className={cn(
+                                "shadow-[0_20px_50px_rgba(0,0,0,0.08)] h-fit mb-20 rounded-sm ring-1 ring-black/5 transition-all duration-300",
+                                isTheftAttempt && "blur-md scale-95"
+                            )}
                         >
                             <LivePreview ref={componentRef} />
                         </div>
+                        
+                        {/* Theft Attempt Overlay */}
+                        {isTheftAttempt && (
+                            <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none animate-in fade-in zoom-in duration-200">
+                                <div className="bg-rose-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm text-center">
+                                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                                        <Monitor className="w-6 h-6 text-white" />
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-1">Premium Feature Locked</h3>
+                                    <p className="text-sm text-rose-100">Screenshots and direct printing are disabled. Please use the Export menu.</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </main>
 
