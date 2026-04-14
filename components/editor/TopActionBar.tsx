@@ -8,6 +8,7 @@ import {
 import { useResumeStore } from "@/store/useResumeStore";
 import { toast } from "sonner";
 import { useState, useCallback, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { PaymentModal } from "./PaymentModal";
 
