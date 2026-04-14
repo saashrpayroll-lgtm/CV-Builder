@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import {
     Download, Printer, Save, ChevronRight, FileText,
-    Loader2, Check, ChevronDown, Lock
+    Loader2, Check, ChevronDown, Lock, Zap
 } from "lucide-react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { toast } from "sonner";
@@ -134,16 +134,22 @@ export function TopActionBar({ onPrint, resumeId }: TopActionBarProps) {
                     {/* Status UI */}
                     {isMonetized && (
                         <div className={cn(
-                            "hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm",
+                            "hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter border-2 transition-all shadow-sm",
                             exportCredits > 0 
-                                ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" 
-                                : "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800 shadow-amber-200/20"
+                                ? "bg-indigo-600 text-white border-indigo-400 shadow-indigo-500/20" 
+                                : "bg-white dark:bg-slate-800 text-slate-500 border-slate-100 dark:border-slate-800"
                         )}>
                             {exportCredits > 0 ? (
-                                <><Check className="w-3 h-3" /> {exportCredits} Exports Left</>
+                                <><Zap className="w-3 h-3 fill-white" /> Premium Mode</>
                             ) : (
-                                <><Lock className="w-3 h-3"/> Locked</>
+                                <><Lock className="w-3 h-3 text-slate-400"/> Free Mode</>
                             )}
+                        </div>
+                    )}
+
+                    {isMonetized && exportCredits > 0 && (
+                        <div className="hidden lg:flex items-center px-2 py-1 bg-amber-500/10 text-amber-600 rounded-lg text-[10px] font-black border border-amber-500/20">
+                            {exportCredits} EXPORTS
                         </div>
                     )}
 

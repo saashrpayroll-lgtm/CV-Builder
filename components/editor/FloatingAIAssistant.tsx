@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useResumeStore } from "@/store/useResumeStore";
+import { PaymentModal } from "./PaymentModal";
 
 const AI_ACTIONS = [
     { id: "grammar", label: "Fix Grammar & Typos", icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", api: "/api/ai/grammar-fix" },
@@ -19,10 +20,19 @@ const AI_ACTIONS = [
 
 export function FloatingAIAssistant() {
     const [isOpen, setIsOpen] = useState(false);
+    const [showPayment, setShowPayment] = useState(false);
     const [activeAction, setActiveAction] = useState<string | null>(null);
-    const { data, setResumeData, updateSection } = useResumeStore();
+    const { data, setResumeData, updateSection, exportCredits, monetizationSettings } = useResumeStore();
+
+    const isLocked = monetizationSettings?.monetization_enabled && exportCredits <= 0;
 
     const handleAction = async (action: typeof AI_ACTIONS[0]) => {
+        if (isLocked) {
+            setShowPayment(true);
+            setIsOpen(false);
+            return;
+        }
+
         setActiveAction(action.id);
         try {
             let body: any = {};
@@ -164,6 +174,12 @@ export function FloatingAIAssistant() {
             {!isOpen && !activeAction && (
                 <div className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-20 pointer-events-none" style={{ animationDuration: '3s' }} />
             )}
+
+            <PaymentModal
+                isOpen={showPayment}
+                onClose={() => setShowPayment(false)}
+                monetizationSettings={monetizationSettings || {}}
+            />
         </div>
     );
 }

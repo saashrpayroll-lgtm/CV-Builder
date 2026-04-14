@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { X, CheckCircle, Loader2, IndianRupee, QrCode } from "lucide-react";
+import { X, CheckCircle, Loader2, IndianRupee, QrCode, Zap } from "lucide-react";
 import { submitUTR } from "@/app/actions/payments";
 import { useResumeStore } from "@/store/useResumeStore";
 
@@ -84,8 +84,14 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                         <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
                             <CheckCircle className="w-8 h-8 text-emerald-500" />
                         </div>
-                        <h3 className="text-xl font-bold">Verification Pending</h3>
-                        <p className="text-slate-500 text-sm">Your Transaction ID `{utr}` has been securely sent to the Admin. Once verified, your export credits will be updated.</p>
+                        <h3 className="text-xl font-bold">
+                            {monetizationSettings?.auto_approve_payments ? "Instantly Unlocked!" : "Verification Pending"}
+                        </h3>
+                        <p className="text-slate-500 text-sm">
+                            {monetizationSettings?.auto_approve_payments 
+                                ? "Your payment was auto-verified. You can now use all premium features!"
+                                : `Your Transaction ID \`${utr}\` has been securely sent to the Admin. Once verified, your resume will be fully unlocked.`}
+                        </p>
                     </div>
                 ) : (
                     <div className="p-6 space-y-6">
@@ -124,7 +130,7 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                         </div>
 
                         {/* UPI QR Display */}
-                        <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 flex gap-4 items-center border border-slate-100 dark:border-slate-700">
+                        <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 flex gap-4 items-center border border-slate-100 dark:border-slate-700 shadow-inner">
                             {monetizationSettings?.payment_upi_qr ? (
                                 <div className="w-24 h-24 shrink-0 bg-white p-1 rounded-lg border shadow-sm flex items-center justify-center">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -138,9 +144,8 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                             <div>
                                 <h4 className="font-semibold text-sm mb-1 text-slate-900 dark:text-white">Scan & Pay via UPI</h4>
                                 <p className="text-xs text-slate-500 leading-relaxed">
-                                    1. Open any UPI app (GPay, PhonePe, Paytm).<br/>
-                                    2. Scan the QR code to pay <span className="font-bold text-slate-700 dark:text-slate-300 block inline">₹{price}</span>.<br/>
-                                    3. Copy the 12-digit UTR below.
+                                    Scan with GPay, PhonePe, or Paytm.<br/>
+                                    Pay <span className="font-bold text-slate-900 dark:text-slate-100 italic">₹{price}</span> and enter UTR below.
                                 </p>
                             </div>
                         </div>
@@ -148,38 +153,35 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
                         {/* Direct UPI Pay Link */}
                         {monetizationSettings?.payment_gateway_key && (
                             <a
-                                href={String(monetizationSettings.payment_gateway_key)}
+                                href={String(monetizationSettings.payment_gateway_key).replace(/&am=\d+/, `&am=${price}`)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full flex items-center justify-center gap-2 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
+                                className="w-full flex items-center justify-center gap-2 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
                             >
-                                <IndianRupee className="w-4 h-4" /> Tap to Pay ₹{price} via UPI
+                                <Zap className="w-4 h-4 fill-white animate-pulse" /> Tap to Pay ₹{price} (Mobile Only)
                             </a>
                         )}
 
                         {/* UTR Input Form */}
-                        <div className="space-y-3">
-                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Submit Transaction ID (UTR)</label>
+                        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex justify-between items-center">
+                                <label className="text-xs font-black uppercase tracking-widest text-slate-400">Enter Transaction ID (UTR)</label>
+                                <span className="text-[10px] text-indigo-500 font-bold bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded">12 Digits</span>
+                            </div>
                             <Input 
                                 placeholder="E.g. 301294857102"
                                 value={utr}
-                                onChange={(e) => setUtr(e.target.value)}
-                                className="h-12 text-center text-lg tracking-widest font-mono border-2 focus-visible:ring-indigo-500 focus-visible:border-transparent transition-all"
+                                onChange={(e) => setUtr(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                                className="h-12 text-center text-xl tracking-[0.3em] font-mono border-2 focus-visible:ring-indigo-500 focus-visible:border-transparent transition-all !rounded-xl"
                             />
-                            <div className="flex items-start gap-2 mt-2 bg-blue-50 dark:bg-blue-500/10 p-3 rounded-lg border border-blue-100 dark:border-blue-500/20">
-                                <CheckCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                                <p className="text-xs text-blue-700 dark:text-blue-300 leading-snug">
-                                    Your export will be unlocked as soon as the Admin verifies this ID inside the portal.
-                                </p>
-                            </div>
                         </div>
 
                         <Button 
                             onClick={handleSubmit} 
                             disabled={isSubmitting || utr.length < 8}
-                            className="w-full h-12 text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none"
+                            className="w-full h-12 text-sm font-bold bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white rounded-xl shadow-xl transition-all active:scale-[0.98]"
                         >
-                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin"/> : "Submit for Verification"}
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin"/> : "Submit & Unlock Now"}
                         </Button>
                     </div>
                 )}
