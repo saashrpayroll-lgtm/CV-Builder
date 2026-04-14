@@ -206,6 +206,7 @@ interface ResumeState {
     markSaved: () => void;
     setExportCredits: (credits: number) => void;
     setMonetizationSettings: (settings: Record<string, string | number | boolean | null> | null) => void;
+    deductOneCredit: () => void;
 }
 
 export const ALL_SECTIONS = [
@@ -385,6 +386,7 @@ export const useResumeStore = create<ResumeState>()(
             
             setExportCredits: (credits) => set({ exportCredits: credits }),
             setMonetizationSettings: (settings) => set({ monetizationSettings: settings }),
+            deductOneCredit: () => set((state) => ({ exportCredits: Math.max(0, state.exportCredits - 1) })),
         }),
         {
             name: 'resume-storage',

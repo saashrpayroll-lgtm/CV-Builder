@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { X, CheckCircle, Loader2, IndianRupee, QrCode } from "lucide-react";
 import { submitUTR } from "@/app/actions/payments";
+import { useResumeStore } from "@/store/useResumeStore";
 
 interface PaymentModalProps {
     isOpen: boolean;
@@ -14,6 +15,7 @@ interface PaymentModalProps {
 }
 
 export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentModalProps) {
+    const { setExportCredits } = useResumeStore();
     const [selectedPackage, setSelectedPackage] = useState<1 | 3>(1);
     const [utr, setUtr] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,14 +39,16 @@ export function PaymentModal({ isOpen, onClose, monetizationSettings }: PaymentM
             toast.error(res.error);
         } else {
             setIsSuccess(true);
-            if (res.autoApproved) {
+            if (res.autoApproved && res.credits !== undefined) {
+                // Update the global store immediately
+                setExportCredits(res.credits);
                 toast.success("🎉 Payment auto-approved! Export unlocked instantly!");
                 setTimeout(() => {
                     onClose();
                     setIsSuccess(false);
                     setUtr("");
-                    window.location.reload(); // Reload to refresh credits
-                }, 2000);
+                    // No reload needed now, UI is reactive
+                }, 1500);
             } else {
                 toast.success("UTR submitted! Waiting for Admin approval.");
                 setTimeout(() => {

@@ -18,8 +18,11 @@ interface TopActionBarProps {
     monetizationSettings?: Record<string, string | number | boolean | null>;
 }
 
-export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizationSettings }: TopActionBarProps) {
-    const { data, isSaving, setIsSaving, markSaved, lastSaved } = useResumeStore();
+export function TopActionBar({ onPrint, resumeId }: TopActionBarProps) {
+    const { 
+        data, isSaving, setIsSaving, markSaved, lastSaved,
+        exportCredits, monetizationSettings, setExportCredits
+    } = useResumeStore();
     const [showExportMenu, setShowExportMenu] = useState(false);
     const [showPayment, setShowPayment] = useState(false);
 
@@ -78,6 +81,8 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
                 toast.error(data.error, { id: "deduct" });
                 return;
             }
+            // Update local state with precise count from server
+            setExportCredits(data.remaining);
             toast.success(`Export authorized! Remaining credits: ${data.remaining}`, { id: "deduct" });
         }
         action();
@@ -127,12 +132,21 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
                 <div className="flex items-center gap-2">
                     {/* Status UI */}
                     {isMonetized && (
-                        <div className="hidden md:flex items-center tracking-widest gap-1 px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-md text-[10px] font-bold uppercase mr-2 border border-amber-200 dark:border-amber-900/50">
-                            {exportCredits > 0 ? `${exportCredits} Exports Left` : <><Lock className="w-3 h-3"/> Locked</>}
+                        <div className={cn(
+                            "hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm",
+                            exportCredits > 0 
+                                ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" 
+                                : "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800 shadow-amber-200/20"
+                        )}>
+                            {exportCredits > 0 ? (
+                                <><Check className="w-3 h-3" /> {exportCredits} Exports Left</>
+                            ) : (
+                                <><Lock className="w-3 h-3"/> Locked</>
+                            )}
                         </div>
                     )}
 
-                    <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-400 mr-2">
+                    <div className="hidden lg:flex items-center gap-1.5 text-[10px] font-medium text-slate-400 mr-2">
                         {isSaving ? (
                             <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</>
                         ) : (
