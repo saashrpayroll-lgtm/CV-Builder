@@ -43,12 +43,8 @@ export default async function EditorPage({ params }: EditorPageProps) {
     const isPro = userData?.subscription_status === "pro";
     const exportCredits = userData?.export_credits || 0;
 
-    // Fetch monetization settings (we grab the first admin_settings row assuming single-tenant/main admin app)
-    const { data: adminSettings } = await supabase
-        .from("admin_settings")
-        .select("monetization_enabled, export_price_1, export_price_3, payment_upi_qr, export_payment_message")
-        .limit(1)
-        .single();
+    // Fetch monetization settings via secure RPC (bypassing RLS safely)
+    const { data: adminSettings } = await supabase.rpc('get_public_settings');
 
     return (
         <div className="h-screen flex flex-col">

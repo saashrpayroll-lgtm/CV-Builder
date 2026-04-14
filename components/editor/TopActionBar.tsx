@@ -62,7 +62,7 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
         return () => clearInterval(timer);
     }, [resumeId, handleSave]);
 
-    const enforcePaywall = (action: () => void) => {
+    const enforcePaywall = async (action: () => void) => {
         setShowExportMenu(false);
         if (isLocked) {
             setShowPayment(true);
@@ -70,7 +70,15 @@ export function TopActionBar({ onPrint, resumeId, exportCredits = 0, monetizatio
         }
 
         if (isMonetized) {
-            toast.success(`Export authorized! Remaining credits after this: ${exportCredits - 1}`);
+            toast.loading("Verifying credits...", { id: "deduct" });
+            const res = await fetch("/api/resume/deduct-credit", { method: "POST" });
+            const data = await res.json();
+            
+            if (data.error) {
+                toast.error(data.error, { id: "deduct" });
+                return;
+            }
+            toast.success(`Export authorized! Remaining credits: ${data.remaining}`, { id: "deduct" });
         }
         action();
     };

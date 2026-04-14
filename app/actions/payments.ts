@@ -9,14 +9,9 @@ export async function submitUTR(utr: string, amount: number, packages: number) {
     if (!user) return { error: "Unauthorized. Please login again." };
     if (!utr || utr.trim().length === 0) return { error: "Invalid UTR" };
 
-    // Check if auto-approve is enabled
-    const { data: adminSettings } = await supabase
-        .from('admin_settings')
-        .select('auto_approve_payments')
-        .limit(1)
-        .single();
-
-    const autoApprove = adminSettings?.auto_approve_payments === true;
+    // Check if auto-approve is enabled securely bypassing RLS
+    const { data: publicSettings } = await supabase.rpc('get_public_settings');
+    const autoApprove = publicSettings?.auto_approve_payments === true;
 
     // Insert payment record
     const { data: payment, error } = await supabase
