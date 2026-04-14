@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Bot, Wand2, X, CheckCircle2, Loader2, Target, Lightbulb, PenTool, Shield, FileText, Zap } from "lucide-react";
+import { Sparkles, Bot, X, CheckCircle2, Loader2, Target, Lightbulb, PenTool, Shield, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ export function FloatingAIAssistant() {
 
         setActiveAction(action.id);
         try {
-            let body: any = {};
+            let body: Record<string, unknown> = {};
 
             switch (action.id) {
                 case "grammar":
@@ -81,7 +81,7 @@ export function FloatingAIAssistant() {
             } else if (action.id === "skills" && result.success) {
                 toast.success(`${Array.isArray(result.skills) ? result.skills.length : 0} skills suggested!`);
                 if (Array.isArray(result.skills)) {
-                    const newSkills = result.skills.slice(0, 5).map((s: any) => ({
+                    const newSkills = result.skills.slice(0, 5).map((s: { name: string; category?: string; percentage?: number }) => ({
                         id: crypto.randomUUID(),
                         name: s.name,
                         category: s.category || "General",

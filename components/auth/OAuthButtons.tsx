@@ -20,8 +20,9 @@ export function GoogleLoginButton() {
                 }
             });
             if (error) throw error;
-        } catch (error: any) {
-            toast.error(error.message || "Failed to login with Google");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to login with Google";
+            toast.error(message);
             setIsLoading(false);
         }
     };
