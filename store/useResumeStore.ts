@@ -186,7 +186,7 @@ interface ResumeState {
     lastSaved: string | null;
     aiCreditsUsed: number;
     exportCredits: number;
-    monetizationSettings: Record<string, unknown> | null;
+    monetizationSettings: Record<string, string | number | boolean | null> | null;
 
     // Actions
     setIsPro: (isPro: boolean) => void;
@@ -205,7 +205,7 @@ interface ResumeState {
     incrementAiCredits: () => void;
     markSaved: () => void;
     setExportCredits: (credits: number) => void;
-    setMonetizationSettings: (settings: Record<string, unknown> | null) => void;
+    setMonetizationSettings: (settings: Record<string, string | number | boolean | null> | null) => void;
 }
 
 export const ALL_SECTIONS = [
