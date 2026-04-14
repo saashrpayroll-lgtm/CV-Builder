@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Bot, Save, TestTube2, Key, Wallet, Image as ImageIcon } from "lucide-react";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function AdminSettingsForm({ initialData, tab }: { initialData: any, tab: "ai" | "monetization" }) {
     const [isLoading, setIsLoading] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
@@ -35,8 +36,8 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
 
             if (!res.ok) throw new Error("Failed to save settings");
             toast.success("Settings saved securely!");
-        } catch (error: any) {
-            toast.error(error.message || "An error occurred");
+        } catch (error: Error | unknown) {
+            toast.error(error instanceof Error ? error.message : "An error occurred");
         } finally {
             setIsLoading(false);
         }
@@ -51,8 +52,8 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
         try {
             await new Promise(r => setTimeout(r, 1500));
             toast.success(`${formData.ai_provider} API connection successful!`);
-        } catch {
-            toast.error("API test failed. Check key validity.");
+        } catch (error: Error | unknown) {
+            toast.error(error instanceof Error ? error.message : "AI connection failed");
         } finally {
             setIsTesting(false);
         }
@@ -224,7 +225,7 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
                             />
                         </div>
                         <p className="text-[10px] text-amber-400 text-center mt-2">
-                            *If the QR doesn't show up here, it won't show for users. Use a direct image link (e.g. ends in .png/.jpg).
+                            *If the QR doesn&apos;t show up here, it won&apos;t show for users. Use a direct image link (e.g. ends in .png/.jpg).
                         </p>
                     </div>
                 )}
