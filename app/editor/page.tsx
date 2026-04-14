@@ -5,13 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import EditorLayout from "@/components/editor/EditorLayout";
 import { useResumeStore, initialResumeData } from "@/store/useResumeStore";
 import { Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 function EditorContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const resumeId = searchParams.get("id");
-    const { setResumeData, loadResume, data } = useResumeStore();
-    const [isLoading, setIsLoading] = useState(!!resumeId);
+    const { setResumeData, loadResume, data, setExportCredits, setMonetizationSettings } = useResumeStore();
+    const [isLoading, setIsLoading] = useState(true);
+    const supabase = createClient();
 
     useEffect(() => {
         if (resumeId) {
@@ -72,6 +74,35 @@ function EditorContent() {
             };
             createNew();
         }
+
+        // --- Fetch Monetization & Credits Synchronization ---
+        const syncSystemData = async () => {
+            try {
+                // 1. Fetch Public Settings
+                const { data: settings } = await supabase.rpc('get_public_settings');
+                if (settings) {
+                    setMonetizationSettings(settings);
+                }
+
+                // 2. Fetch User Credits
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('users')
+                        .select('export_credits')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (profile) {
+                        setExportCredits(profile.export_credits || 0);
+                    }
+                }
+            } catch (error) {
+                console.error("Error syncing monetization data:", error);
+            }
+        };
+
+        syncSystemData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resumeId]);
 
