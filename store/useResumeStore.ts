@@ -185,6 +185,8 @@ interface ResumeState {
     isSaving: boolean;
     lastSaved: string | null;
     aiCreditsUsed: number;
+    exportCredits: number;
+    monetizationSettings: Record<string, any> | null;
 
     // Actions
     setIsPro: (isPro: boolean) => void;
@@ -202,6 +204,8 @@ interface ResumeState {
     loadResume: (data: ResumeData) => void;
     incrementAiCredits: () => void;
     markSaved: () => void;
+    setExportCredits: (credits: number) => void;
+    setMonetizationSettings: (settings: Record<string, any> | null) => void;
 }
 
 export const ALL_SECTIONS = [
@@ -376,6 +380,9 @@ export const useResumeStore = create<ResumeState>()(
                 })),
 
             markSaved: () => set({ isSaving: false, lastSaved: new Date().toISOString() }),
+            
+            setExportCredits: (credits) => set({ exportCredits: credits }),
+            setMonetizationSettings: (settings) => set({ monetizationSettings: settings }),
         }),
         {
             name: 'resume-storage',

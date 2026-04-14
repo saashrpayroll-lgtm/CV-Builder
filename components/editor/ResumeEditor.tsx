@@ -12,12 +12,14 @@ interface ResumeEditorProps {
 }
 
 export default function ResumeEditor({ initialData, isPro, exportCredits, monetizationSettings }: ResumeEditorProps) {
-    const { setResumeData, setIsPro } = useResumeStore();
+    const { setResumeData, setIsPro, setExportCredits, setMonetizationSettings } = useResumeStore();
     const isMounted = useRef(false);
 
     useEffect(() => {
         setIsPro(isPro);
-    }, [isPro, setIsPro]);
+        setExportCredits(exportCredits);
+        setMonetizationSettings(monetizationSettings);
+    }, [isPro, exportCredits, monetizationSettings, setIsPro, setExportCredits, setMonetizationSettings]);
 
     useEffect(() => {
         if (initialData.content && !isMounted.current) {

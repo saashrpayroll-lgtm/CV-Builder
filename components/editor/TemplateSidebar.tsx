@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { TEMPLATES_LIBRARY, CATEGORIES, TemplateMetadata } from "@/lib/templates";
 import { UpgradeModal } from "@/components/subscription/UpgradeModal";
+import { PaymentModal } from "./PaymentModal";
 
 const TemplateMiniOutline = ({ template }: { template: TemplateMetadata }) => {
     const { primary, secondary, bg } = template.previewColors;
@@ -131,14 +132,22 @@ const TemplateMiniOutline = ({ template }: { template: TemplateMetadata }) => {
 };
 
 export function TemplateSidebar() {
-    const { data, updateSection, updateTheme, isPro } = useResumeStore();
+    const { data, updateSection, updateTheme, isPro, exportCredits, monetizationSettings } = useResumeStore();
     const [search, setSearch] = useState("");
     const [selectedCat, setSelectedCat] = useState("All");
     const [showUpgrade, setShowUpgrade] = useState(false);
+    const [showPayment, setShowPayment] = useState(false);
+
+    const isMonetized = monetizationSettings?.monetization_enabled;
+    const hasPremiumAccess = isPro || exportCredits > 0;
 
     const handleSelectTemplate = (template: TemplateMetadata) => {
-        if (template.premium && !isPro) {
-            setShowUpgrade(true);
+        if (template.premium && !hasPremiumAccess) {
+            if (isMonetized) {
+                setShowPayment(true);
+            } else {
+                setShowUpgrade(true);
+            }
             return;
         }
         updateSection('templateId', template.id);
@@ -257,6 +266,12 @@ export function TemplateSidebar() {
             </div>
 
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
+            
+            <PaymentModal 
+                isOpen={showPayment} 
+                onClose={() => setShowPayment(false)} 
+                monetizationSettings={monetizationSettings || {}} 
+            />
         </div>
     );
 }
