@@ -64,9 +64,14 @@ export async function POST(req: NextRequest) {
             .eq("id", data.user.id)
             .single();
 
-        if (profileError || profile?.role !== "ADMIN") {
+        if (profileError) {
             await supabase.auth.signOut();
-            return NextResponse.json({ error: "Access denied. This account does not have admin privileges." }, { status: 403 });
+            return NextResponse.json({ error: `Database error finding profile: ${profileError.message}` }, { status: 403 });
+        }
+
+        if (profile?.role !== "ADMIN") {
+            await supabase.auth.signOut();
+            return NextResponse.json({ error: `Access denied. Your current database role is '${profile?.role}'. Please update it to 'ADMIN' using the SQL Editor.` }, { status: 403 });
         }
 
         return NextResponse.json({ success: true, user: { id: data.user.id, email: data.user.email } });
