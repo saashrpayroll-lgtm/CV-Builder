@@ -211,10 +211,21 @@ export default function AdminSettingsForm({ initialData, tab }: { initialData: a
                 {formData.payment_upi_qr && (
                     <div className="p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
                         <p className="text-xs text-slate-400 mb-2 font-bold">QR Preview (what users will see):</p>
-                        <div className="w-40 h-40 mx-auto bg-white rounded-xl p-2 overflow-hidden">
+                        <div className="w-40 h-40 mx-auto bg-white rounded-xl p-2 overflow-hidden relative flex items-center justify-center">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={formData.payment_upi_qr} alt="UPI QR" className="w-full h-full object-contain" />
+                            <img 
+                                src={formData.payment_upi_qr} 
+                                alt="UPI QR preview loading or invalid" 
+                                className="w-full h-full object-contain" 
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="9" y1="13" x2="15" y2="13"/></svg>';
+                                    toast.error("Invalid Image URL! Make sure it ends with .png or .jpg (Not a webpage URL)");
+                                }}
+                            />
                         </div>
+                        <p className="text-[10px] text-amber-400 text-center mt-2">
+                            *If the QR doesn't show up here, it won't show for users. Use a direct image link (e.g. ends in .png/.jpg).
+                        </p>
                     </div>
                 )}
             </div>
