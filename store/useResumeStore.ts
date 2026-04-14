@@ -186,7 +186,7 @@ interface ResumeState {
     lastSaved: string | null;
     aiCreditsUsed: number;
     exportCredits: number;
-    monetizationSettings: Record<string, any> | null;
+    monetizationSettings: Record<string, unknown> | null;
 
     // Actions
     setIsPro: (isPro: boolean) => void;
@@ -205,7 +205,7 @@ interface ResumeState {
     incrementAiCredits: () => void;
     markSaved: () => void;
     setExportCredits: (credits: number) => void;
-    setMonetizationSettings: (settings: Record<string, any> | null) => void;
+    setMonetizationSettings: (settings: Record<string, unknown> | null) => void;
 }
 
 export const ALL_SECTIONS = [
@@ -291,13 +291,15 @@ export const initialResumeData: ResumeData = {
 
 export const useResumeStore = create<ResumeState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             data: initialResumeData,
             isPro: false,
             isLoading: false,
             isSaving: false,
             lastSaved: null,
             aiCreditsUsed: 0,
+            exportCredits: 0,
+            monetizationSettings: null,
 
             setIsPro: (isPro) => set({ isPro }),
             setIsLoading: (isLoading) => set({ isLoading }),
@@ -361,7 +363,7 @@ export const useResumeStore = create<ResumeState>()(
                             [sectionId]: false,
                         },
                         // Optionally reset data if it's an array to clear it fully
-                        [sectionId]: Array.isArray((state.data as any)[sectionId]) ? [] : (state.data as any)[sectionId]
+                        [sectionId]: Array.isArray(state.data[sectionId as keyof ResumeData]) ? [] : state.data[sectionId as keyof ResumeData]
                     },
                 })),
 
